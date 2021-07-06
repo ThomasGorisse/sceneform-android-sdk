@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
 
+import androidx.annotation.IntRange;
 import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 
@@ -61,9 +62,12 @@ public class ArSceneView extends SceneView {
     // threads however.
     private final SequentialTask pauseResumeTask = new SequentialTask();
     private int cameraTextureId;
-    @Nullable private Session session;
-    @Nullable private Frame currentFrame;
-    @Nullable private Config cachedConfig;
+    @Nullable
+    private Session session;
+    @Nullable
+    private Frame currentFrame;
+    @Nullable
+    private Config cachedConfig;
     private int minArCoreVersionCode;
     private Display display;
     private CameraStream cameraStream;
@@ -71,12 +75,17 @@ public class ArSceneView extends SceneView {
     private Image depthImage;
     private boolean lightEstimationEnabled = true;
     private boolean isLightDirectionUpdateEnabled = true;
-    @Nullable private Consumer<EnvironmentalHdrLightEstimate> onNextHdrLightingEstimate = null;
+    @Nullable
+    private Consumer<EnvironmentalHdrLightEstimate> onNextHdrLightingEstimate = null;
     private float lastValidPixelIntensity = DEFAULT_PIXEL_INTENSITY;
-    @Nullable private Anchor lastValidEnvironmentalHdrAnchor;
-    @Nullable private float[] lastValidEnvironmentalHdrAmbientSphericalHarmonics;
-    @Nullable private float[] lastValidEnvironmentalHdrMainLightDirection;
-    @Nullable private float[] lastValidEnvironmentalHdrMainLightIntensity;
+    @Nullable
+    private Anchor lastValidEnvironmentalHdrAnchor;
+    @Nullable
+    private float[] lastValidEnvironmentalHdrAmbientSphericalHarmonics;
+    @Nullable
+    private float[] lastValidEnvironmentalHdrMainLightDirection;
+    @Nullable
+    private float[] lastValidEnvironmentalHdrMainLightIntensity;
 
     /**
      * Constructs a ArSceneView object and binds it to an Android Context.
@@ -165,8 +174,8 @@ public class ArSceneView extends SceneView {
 
     private void initializeFacingDirection(Session session) {
         if (session.getCameraConfig().getFacingDirection() == FacingDirection.FRONT) {
-            Renderer renderer = Preconditions.checkNotNull(getRenderer());
-            renderer.setFrontFaceWindingInverted(true);
+//            Renderer renderer = Preconditions.checkNotNull(getRenderer());
+//            renderer.setFrontFaceWindingInverted(true);
         }
     }
 
@@ -383,7 +392,9 @@ public class ArSceneView extends SceneView {
     /**
      * Returns the CameraStream, used to control if the occlusion should be enabled or disabled.
      */
-    public CameraStream getCameraStream() { return cameraStream; }
+    public CameraStream getCameraStream() {
+        return cameraStream;
+    }
 
     /**
      * Before the render call occurs, update the ARCore session to grab the latest frame and update
@@ -452,7 +463,7 @@ public class ArSceneView extends SceneView {
 
             Frame frame = currentFrame;
             if (frame != null) {
-                if(cameraStream.getDepthOcclusionMode() == CameraStream.DepthOcclusionMode.DEPTH_OCCLUSION_ENABLED) {
+                if (cameraStream.getDepthOcclusionMode() == CameraStream.DepthOcclusionMode.DEPTH_OCCLUSION_ENABLED) {
                     if (cameraStream.getDepthMode() == CameraStream.DepthMode.DEPTH) {
                         try (Image depthImage = currentFrame.acquireDepthImage()) {
                             cameraStream.recalculateOcclusion(depthImage);
@@ -721,6 +732,10 @@ public class ArSceneView extends SceneView {
         cameraTextureId = GLHelper.createCameraTexture();
         Renderer renderer = Preconditions.checkNotNull(getRenderer());
         cameraStream = new CameraStream(cameraTextureId, renderer);
+    }
+
+    public void setCameraStreamRenderPriority(@IntRange(from = 0L, to = 7L) int priority) {
+        this.cameraStream.setRenderPriority(priority);
     }
 
     private void ensureUpdateMode() {
